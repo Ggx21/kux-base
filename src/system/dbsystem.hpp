@@ -4,7 +4,7 @@
 #include <filesystem/fileio/FileManager.h>
 
 const std::string base_dir = "./data";
-const std::string table_file = "tables.bin";
+const std::string db_description_file = "tables.bin"; // db description file
 
 void createFolder(std::string name, bool exist_ok);
 
@@ -23,6 +23,9 @@ public:
     }
     ~dbsystem() {}
     void createDatabase(std::string db_name);
+    void useDatabase(std::string db_name);
+    void closeDatabase(std::string db_name);
+    void createTable(std::string table_name);
 
 private:
     std::set<std::string> databases;
