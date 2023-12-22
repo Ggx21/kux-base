@@ -1,4 +1,5 @@
-
+#pragma once
+#include <string>
 
 enum class ErrorTypeEnum : int
 {
@@ -8,3 +9,15 @@ enum class ErrorTypeEnum : int
     SemanticError,
     InternalError,
 };
+
+const std::string base_dir = "./data";
+const std::string db_description_file = "meta.bin";
+
+struct table_entry
+{
+    u_int32_t table_id;
+    const u_int32_t table_name_len=32;
+    char table_name[32];
+};
+
+const int table_entry_size = sizeof(table_entry);//40

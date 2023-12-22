@@ -1,11 +1,15 @@
+#pragma once
+
 #include <set>
 #include <filesystem>
 #include <unordered_map>
 #include <filesystem/bufmanager/BufPageManager.h>
 #include <filesystem/fileio/FileManager.h>
 
-const std::string base_dir = "./data";
-const std::string db_description_file = "tables.bin";
+#include "../common/error.hpp"
+#include "../common/const.hpp"
+
+
 
 void createFolder(std::string name, bool exist_ok);
 
@@ -17,7 +21,11 @@ public:
         static DatabaseSystem instance; // 声明一个静态实例
         return instance;
     }
+    //------------------utils------------------
+    void writeMeta();
 
+
+    //------------------dml visitor------------------
     void createDatabase(std::string db_name);
     void dropDatabase(std::string db_name);
     void useDatabase(std::string db_name);
@@ -29,7 +37,6 @@ public:
     void showTables();
     void showIndexes();
 
-
 private:
     std::set<std::string> databases;
     std::string current_db;
@@ -39,10 +46,10 @@ private:
     std::unordered_map<std::string, int> tables;
 
     bool on_use;
-    int db_description_fd;
+    int db_description_fileID;//fileID of db_description_file，在useDatabase时初始化
 
-    std::unordered_map<int, int> table_meta_fd;
-    std::unordered_map<int, int> table_data_fd;
+    std::unordered_map<int, int> table_meta_fileID;
+    std::unordered_map<int, int> table_data_fileID;
 
     int nextTableID();
 
