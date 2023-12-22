@@ -55,6 +55,7 @@ private:
 
     DatabaseSystem()
     {
+        std::cerr<<"DatabaseSystem init\n";
         MyBitMap::initConst();
         fm = new FileManager();
         bpm = new BufPageManager(fm);

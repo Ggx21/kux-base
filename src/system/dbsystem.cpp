@@ -49,7 +49,8 @@ void DatabaseSystem::createDatabase(std::string db_name)
     fm->openFile(file_dir.c_str(), fileID);
     int index;
     BufType b = bpm->allocPage(fileID, 0, index, false);
-    b[0] = 0;
+    memset(b, 0, PAGE_SIZE);
+    std::cerr << "create database, table num:" << b[0] << "index:" << index << "\n";
     bpm->markDirty(index);
     bpm->writeBack(index);
     fm->closeFile(fileID);
@@ -80,7 +81,7 @@ std::string read_string(BufType &p, int len)
 {
     std::string rst;
     rst.assign(reinterpret_cast<char *>(p), len);
-    p += (len / 4);
+    p += (len + 3) >> 2;
     return rst;
 }
 
@@ -93,24 +94,26 @@ void wirte_val(BufType &p, int val)
 void wirte_string(BufType &p, std::string val)
 {
     memcpy(reinterpret_cast<char *>(p), val.c_str(), val.length());
-    //向上取整
+    // 向上取整
     p += (val.length() + 3) >> 2;
 }
 
 void write_table_entry(BufType &p, table_entry entry)
 {
-    std::cerr<<"write table entry, table name:"<<entry.table_name<<"table id:"<<entry.table_id<<"table name len:"<<entry.table_name_len<<"\n";
+    memset(p, 0, table_entry_size);
+    std::cerr << "write table entry, table name:" << entry.table_name << "table id:" << entry.table_id << "table name len:" << entry.table_name_len << "\n";
     wirte_val(p, entry.table_id);
     wirte_val(p, entry.table_name_len);
     wirte_string(p, entry.table_name);
 }
 
-const table_entry &read_table_entry(BufType &p)
+table_entry* read_table_entry(BufType &p)
 {
-    table_entry entry;
-    entry.table_id = read_val(p);
-    std::string table_name = read_string(p, entry.table_name_len);
-    strcpy(entry.table_name, table_name.c_str());
+    table_entry* entry = new table_entry();
+    entry->table_id = read_val(p);
+    p++;
+    std::string table_name = read_string(p, entry->table_name_len);
+    strcpy(entry->table_name, table_name.c_str());
     return entry;
 }
 
@@ -127,24 +130,25 @@ void DatabaseSystem::useDatabase(std::string db_name)
     // open description file
     std::string file_dir = base_dir + "/" + db_name + "/" + db_description_file;
     fm->openFile(file_dir.c_str(), db_description_fileID);
-    // read dababase information
+    // read database information
     int index;
     BufType b = bpm->getPage(db_description_fileID, 0, index);
+    b += 3;
     table_num = read_val(b);
     int table_id, table_name_len;
     std::string table_name;
     for (int i = 0; i < table_num; i++)
     {
-        // // read table info
-        // table_id = read_val(b);
-        // table_name_len = read_val(b);
-        // table_name = read_string(b, table_name_len);
-        table_entry entry = read_table_entry(b);
-        table_id = entry.table_id;
-        table_name = entry.table_name;
+        table_entry* entry = read_table_entry(b);
+        table_id = entry->table_id;
+        table_name = entry->table_name;
         tables[table_name] = table_id;
     }
-    std::cout << table_num << "\n";
+    std::cout << "table num:" << table_num << "\n";
+    for (auto &table : tables)
+    {
+        std::cout << table.first << "\n";
+    }
 }
 
 void DatabaseSystem::closeDatabase()
@@ -152,12 +156,6 @@ void DatabaseSystem::closeDatabase()
     // write back to db description
     int index;
     BufType b = bpm->getPage(db_description_fileID, 0, index);
-    b[0] = table_num;
-    int table_id, table_name_len;
-    std::string table_name;
-    bpm->markDirty(index);
-    bpm->writeBack(index);
-    fm->closeFile(db_description_fileID);
     on_use = false;
     current_db = "";
     tables.clear();
@@ -210,7 +208,7 @@ void DatabaseSystem::createTable(std::string table_name)
 
     // store info to meta file
     table_num++;
-    b[0] = table_num;
+    b[3] = table_num;
     b += 4;
     b += table_entry_size * (table_num - 1) >> 2;
     table_entry entry;
