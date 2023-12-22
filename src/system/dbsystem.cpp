@@ -176,11 +176,18 @@ int DatabaseSystem::nextTableID()
 {
     int id = 0;
     // check if id is in tables.values()
-    for (auto &table : tables)
+    bool find = true;
+    while (find)
     {
-        if (table.second == id)
+        find = false;
+        for (auto &table : tables)
         {
-            id++;
+            if (table.second == id)
+            {
+                id++;
+                find = true;
+                break;
+            }
         }
     }
     return id;
