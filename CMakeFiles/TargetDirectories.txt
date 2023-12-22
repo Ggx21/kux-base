@@ -1,6 +1,0 @@
-/mnt/c/Users/zhang/dbs-project-36/CMakeFiles/database.dir
-/mnt/c/Users/zhang/dbs-project-36/CMakeFiles/edit_cache.dir
-/mnt/c/Users/zhang/dbs-project-36/CMakeFiles/rebuild_cache.dir
-/mnt/c/Users/zhang/dbs-project-36/3rd_party/antlr4_runtime/CMakeFiles/antlr4_runtime.dir
-/mnt/c/Users/zhang/dbs-project-36/3rd_party/antlr4_runtime/CMakeFiles/edit_cache.dir
-/mnt/c/Users/zhang/dbs-project-36/3rd_party/antlr4_runtime/CMakeFiles/rebuild_cache.dir

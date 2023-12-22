@@ -9,21 +9,17 @@ const std::string db_description_file = "tables.bin";
 
 void createFolder(std::string name, bool exist_ok);
 
-class dbsystem {
+class DatabaseSystem
+{
 public:
-    dbsystem() {
-        MyBitMap::initConst();
-        fm = new FileManager();
-        bpm = new BufPageManager(fm);
-        createFolder(base_dir, true);
-        for (auto &file: std::filesystem::directory_iterator(base_dir)) {
-            if (std::filesystem::is_directory(file)) {
-                databases.insert(std::filesystem::path(file).filename());
-            }
-        }
+    static DatabaseSystem &getInstance()
+    {
+        static DatabaseSystem instance; // 声明一个静态实例
+        return instance;
     }
-    ~dbsystem() {}
+
     void createDatabase(std::string db_name);
+    void dropDatabase(std::string db_name);
     void useDatabase(std::string db_name);
     void closeDatabase();
     void createTable(std::string table_name);
@@ -44,4 +40,21 @@ private:
 
     int nextTableID();
 
+    DatabaseSystem()
+    {
+        MyBitMap::initConst();
+        fm = new FileManager();
+        bpm = new BufPageManager(fm);
+        createFolder(base_dir, true);
+        for (auto &file : std::filesystem::directory_iterator(base_dir))
+        {
+            if (std::filesystem::is_directory(file))
+            {
+                databases.insert(std::filesystem::path(file).filename());
+            }
+        }
+    }
+    ~DatabaseSystem() {}
+    DatabaseSystem(const DatabaseSystem &) = delete;
+    DatabaseSystem &operator=(const DatabaseSystem &) = delete;
 };

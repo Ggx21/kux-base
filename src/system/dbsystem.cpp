@@ -1,31 +1,35 @@
-#include <system/dbsystem.hpp>
 #include <filesystem>
 #include <cstring>
+#include "../common/error.hpp"
+#include "dbsystem.hpp"
+
+namespace fs = std::filesystem;
 
 void createFolder(std::string name, bool exist_ok) {
     if (exist_ok) {
-        if (std::filesystem::exists(name)) {
-            if (std::filesystem::is_directory(name) == false) {
-                // throw some error
+        if (fs::exists(name)) {
+            if (fs::is_directory(name) == false) {
+                DbError().throw_error(ErrorTypeEnum::SemanticError, "file exists but is not a directory");
             }
         }
-        else 
-            std::filesystem::create_directory(name);
+        else
+            fs::create_directory(name);
     }
     else {
-        if (std::filesystem::exists(name)) {
-            // throw some error
+        if (fs::exists(name))
+        {
+            DbError().throw_error(ErrorTypeEnum::SemanticError, "file exists");
         }
         else {
-            std::filesystem::create_directory(name);
+            fs::create_directory(name);
         }
     }
 }
 
-void dbsystem::createDatabase(std::string db_name) {
+void DatabaseSystem::createDatabase(std::string db_name) {
     // create folder
     if (databases.find(db_name) != databases.end()) {
-        // database already exists, throw some error
+        DbError().throw_error(ErrorTypeEnum::SemanticError, "database already exists");
     }
     databases.insert(db_name);
     createFolder(base_dir + "/" + db_name, false);
@@ -42,6 +46,18 @@ void dbsystem::createDatabase(std::string db_name) {
     fm->closeFile(fileID);
     std::cout << "create database success\n";
 }
+
+void DatabaseSystem::dropDatabase(std::string db_name) {
+    if (databases.find(db_name) == databases.end()) {
+        DbError().throw_error(ErrorTypeEnum::SemanticError, "database not exists");
+    }
+    databases.erase(db_name);
+    std::string file_dir = base_dir + "/" + db_name;
+    fs::remove_all(file_dir);
+    std::cout << "drop database success\n";
+    DbError().throw_warning("drop database is written by ggx, not tested,error may occur");
+}
+
 
 int read_val(BufType p) {
     int rst = (*p);
@@ -66,7 +82,7 @@ void wirte_string(BufType p, std::string val) {
     p += (val.length()+3)/4;
 }
 
-void dbsystem::useDatabase(std::string db_name) {
+void DatabaseSystem::useDatabase(std::string db_name) {
     if (databases.find(db_name) == databases.end()) {
         // unknown database, throw error
     }
@@ -96,12 +112,12 @@ void dbsystem::useDatabase(std::string db_name) {
     std::cout << table_num << "\n";
 }
 
-void dbsystem::closeDatabase() {
+void DatabaseSystem::closeDatabase() {
     // write back to db description
     db_description_fd;
 }
 
-int dbsystem::nextTableID() {
+int DatabaseSystem::nextTableID() {
     int id = 0;
     // while(tables.right.find(id) != tables.right.end()) {
     //     id++;
@@ -109,7 +125,7 @@ int dbsystem::nextTableID() {
     return id;
 }
 
-void dbsystem::createTable(std::string table_name) {
+void DatabaseSystem::createTable(std::string table_name) {
     if (!on_use) {
         // cannot create table w/o selecting database, throw error
     }
@@ -121,7 +137,7 @@ void dbsystem::createTable(std::string table_name) {
     fm->openFile(file_dir.c_str(), fileID);
     int index;
     BufType b = bpm->getPage(fileID, 0, index);
-    
+
     // store info to meta file
 
     // create new data file

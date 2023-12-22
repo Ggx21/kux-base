@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(database CXX)
+project(compiler CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
@@ -9,9 +9,10 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 file(GLOB_RECURSE SRC "src/*.cpp")
 
 include_directories(src)
-include_directories(3rd_party/antlr4_runtime)
+include_directories(3rd_party/antlr4-runtime)
+include_directories(3rd_party/cxxopts)
 
-add_subdirectory(3rd_party/antlr4_runtime)
+add_subdirectory(3rd_party/antlr4-runtime)
 
 add_executable(database ${SRC})
 target_link_libraries(database antlr4_runtime)
