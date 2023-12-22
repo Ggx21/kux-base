@@ -84,7 +84,7 @@ void wirte_string(BufType p, std::string val) {
 
 void DatabaseSystem::useDatabase(std::string db_name) {
     if (databases.find(db_name) == databases.end()) {
-        // unknown database, throw error
+        DbError().throw_error(ErrorTypeEnum::SemanticError, "database not exists");
     }
     if (on_use)
         closeDatabase();
@@ -107,14 +107,36 @@ void DatabaseSystem::useDatabase(std::string db_name) {
         tables[table_name] = table_id;
     }
     for (int i=0; i<table_num; i++) {
-
+        //todo: read table info
     }
     std::cout << table_num << "\n";
 }
 
 void DatabaseSystem::closeDatabase() {
     // write back to db description
-    db_description_fd;
+    int index;
+    BufType b = bpm->getPage(db_description_fd, 0, index);
+    b[0] = table_num;
+    int table_id, table_name_len;
+    std::string table_name;
+    for (int i=0; i<table_num; i++) {
+        // read table if
+        table_id = read_val(b);
+        table_name_len = read_val(b);
+        table_name = read_string(b, table_name_len);
+        tables[table_name] = table_id;
+    }
+    for (int i=0; i<table_num; i++) {
+        //todo: write back table info
+    }
+    bpm->markDirty(index);
+    bpm->writeBack(index);
+    fm->closeFile(db_description_fd);
+    on_use = false;
+    current_db = "";
+    tables.clear();
+    table_num = 0;
+
 }
 
 void DatabaseSystem::showDatabases()
@@ -127,9 +149,9 @@ void DatabaseSystem::showDatabases()
 
 int DatabaseSystem::nextTableID() {
     int id = 0;
-    // while(tables.right.find(id) != tables.right.end()) {
-    //     id++;
-    // }
+    while(tables.right.find(id) != tables.right.end()) {
+        id++;
+    }
     return id;
 }
 
