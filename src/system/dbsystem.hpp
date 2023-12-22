@@ -22,7 +22,13 @@ public:
     void dropDatabase(std::string db_name);
     void useDatabase(std::string db_name);
     void closeDatabase();
+    void showDatabases();
     void createTable(std::string table_name);
+    void dropTable(std::string table_name);
+    void descTable(std::string table_name);
+    void showTables();
+    void showIndexes();
+
 
 private:
     std::set<std::string> databases;

@@ -117,6 +117,14 @@ void DatabaseSystem::closeDatabase() {
     db_description_fd;
 }
 
+void DatabaseSystem::showDatabases()
+{
+    for (auto &db : databases)
+    {
+        std::cout << db << "\n";
+    }
+}
+
 int DatabaseSystem::nextTableID() {
     int id = 0;
     // while(tables.right.find(id) != tables.right.end()) {
@@ -142,3 +150,47 @@ void DatabaseSystem::createTable(std::string table_name) {
 
     // create new data file
 }
+
+void DatabaseSystem::dropTable(std::string table_name) {
+    if (!on_use) {
+        // cannot create table w/o selecting database, throw error
+        DbError().throw_error(ErrorTypeEnum::SemanticError, "no database selected");
+    }
+    if (tables.find(table_name) == tables.end()) {
+        // table not exists, throw error
+        DbError().throw_error(ErrorTypeEnum::SemanticError, "table not exists");
+    }
+    int table_id = tables[table_name];
+    tables.erase(table_name);
+    // store table info to db_description file
+    std::string file_dir = base_dir + "/" + current_db + "/" + db_description_file;
+    int fileID;
+    fm->openFile(file_dir.c_str(), fileID);
+    int index;
+    BufType b = bpm->getPage(fileID, 0, index);
+
+    // store info to meta file
+
+    // create new data file
+}
+
+void DatabaseSystem::descTable(std::string table_name) {
+    DbError().throw_unimplemented("desc table");
+}
+
+void DatabaseSystem::showTables() {
+    if (!on_use) {
+        // cannot create table w/o selecting database, throw error
+        DbError().throw_error(ErrorTypeEnum::SemanticError, "no database selected");
+    }
+    for (auto &table : tables) {
+        std::cout << table.first << "\n";
+    }
+}
+
+void DatabaseSystem::showIndexes() {
+    DbError().throw_unimplemented("show indexes");
+}
+
+
+

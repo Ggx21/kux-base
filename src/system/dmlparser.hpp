@@ -36,37 +36,55 @@ namespace parser
 
         antlrcpp::Any visitShow_dbs(SQLParser::Show_dbsContext *ctx) override
         {
-            DbError().throw_unimplemented("show dbs");
+            DbError().throw_info("show dbs");
+            DatabaseSystem::getInstance().showDatabases();
+            return visitChildren(ctx);
         }
 
         antlrcpp::Any visitUse_db(SQLParser::Use_dbContext *ctx) override
         {
-            DbError().throw_unimplemented("use db");
+            std::string db_name = ctx->Identifier()->getText();
+            DbError().throw_info("use db" + db_name);
+            DatabaseSystem::getInstance().useDatabase(db_name);
+            return visitChildren(ctx);
         }
 
         antlrcpp::Any visitShow_tables(SQLParser::Show_tablesContext *ctx) override
         {
-            DbError().throw_unimplemented("show tables");
+            DbError().throw_info("show tables");
+            DatabaseSystem::getInstance().showTables();
+            return visitChildren(ctx);
         }
 
         antlrcpp::Any visitShow_indexes(SQLParser::Show_indexesContext *ctx) override
         {
-            DbError().throw_unimplemented("show indexes");
+            DbError().throw_info("show indexes");
+            DatabaseSystem::getInstance().showIndexes();
+            return visitChildren(ctx);
         }
 
         antlrcpp::Any visitCreate_table(SQLParser::Create_tableContext *ctx) override
         {
-            DbError().throw_unimplemented("create table");
+            std::string table_name = ctx->Identifier()->getText();
+            DbError().throw_info("create table " + table_name);
+            DatabaseSystem::getInstance().createTable(table_name);
+            return visitChildren(ctx);
         }
 
         antlrcpp::Any visitDrop_table(SQLParser::Drop_tableContext *ctx) override
         {
-            DbError().throw_unimplemented("drop table");
+            std::string table_name = ctx->Identifier()->getText();
+            DbError().throw_info("drop table " + table_name);
+            DatabaseSystem::getInstance().dropTable(table_name);
+            return visitChildren(ctx);
         }
 
         antlrcpp::Any visitDescribe_table(SQLParser::Describe_tableContext *ctx) override
         {
-            DbError().throw_unimplemented("describe table");
+            std::string table_name = ctx->Identifier()->getText();
+            DbError().throw_info("describe table " + table_name);
+            DatabaseSystem::getInstance().descTable(table_name);
+            return visitChildren(ctx);
         }
 
         antlrcpp::Any visitLoad_table(SQLParser::Load_tableContext *ctx) override
