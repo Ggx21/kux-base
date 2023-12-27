@@ -60,7 +60,6 @@ void DatabaseSystem::saveTableMetadataToFile(const TableMetadata &metadata, cons
     fm->openFile(filepath.c_str(), fileID);
     int index;
     BufType b = bpm->allocPage(fileID, 0, index, false);
-    memset(b, 0, PAGE_SIZE);
     // 写入表名
     int32_t tableNameLength = table_entry().table_name_len;
     b += RESERVED_EVERY_PAGE;
@@ -146,8 +145,8 @@ TableMetadata DatabaseSystem::loadTableMetadataFromFile(const std::string &filep
         }
     }
 
+    bpm->release(index);
     fm->closeFile(fileID);
-    memset(b, 0, PAGE_SIZE);
     std::cout << "Table metadata loaded from file: " << filepath << std::endl;
     return metadata;
 }
@@ -513,4 +512,5 @@ void DatabaseSystem::insertIntoTable(std::string table_name, const TableRow &row
     metadata.row_num++;
     // TODO:bugfix,什么时候把修改信息写回文件？
     saveTableMetadataToFile(metadata, base_dir + "/" + current_db + "/" + table_name + ".meta");
+    DbError().throw_info("insertRow into table: " + table_name + " success");
 }
