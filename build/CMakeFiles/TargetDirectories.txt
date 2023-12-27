@@ -1,6 +1,0 @@
-/home/ggx/home/zyk_base/dbs-project-36/build/CMakeFiles/database.dir
-/home/ggx/home/zyk_base/dbs-project-36/build/CMakeFiles/edit_cache.dir
-/home/ggx/home/zyk_base/dbs-project-36/build/CMakeFiles/rebuild_cache.dir
-/home/ggx/home/zyk_base/dbs-project-36/build/3rd_party/antlr4-runtime/CMakeFiles/antlr4_runtime.dir
-/home/ggx/home/zyk_base/dbs-project-36/build/3rd_party/antlr4-runtime/CMakeFiles/edit_cache.dir
-/home/ggx/home/zyk_base/dbs-project-36/build/3rd_party/antlr4-runtime/CMakeFiles/rebuild_cache.dir
