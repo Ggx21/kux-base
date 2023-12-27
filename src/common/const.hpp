@@ -1,14 +1,12 @@
 #pragma once
 #include <string>
 
-enum class ErrorTypeEnum : int
-{
-    UnimplementedError,
-    SyntaxError,
-    TypeError,
-    SemanticError,
-    InternalError,
-};
+
+const int RESERVED_EVERY_PAGE = 4;
+
+const int FIELD_NAME_LEN = 28;
+
+
 
 const std::string base_dir = "./data";
 const std::string db_description_file = "meta.bin";
@@ -21,3 +19,7 @@ struct table_entry
 };
 
 const int table_entry_size = sizeof(table_entry);//48
+
+const int INT32 = 0;
+const int FLOAT32 = 1;
+const int VARCHAR = 2;

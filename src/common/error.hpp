@@ -8,6 +8,15 @@
 
 static const bool DEBUG_PRINT = true;
 
+enum class ErrorTypeEnum : int
+{
+    UnimplementedError,
+    SyntaxError,
+    TypeError,
+    SemanticError,
+    InternalError,
+};
+
 class DbError
 {
 public:
