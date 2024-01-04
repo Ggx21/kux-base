@@ -39,8 +39,8 @@ public:
     void descTable(std::string table_name);
     void showTables();
     void showIndexes();
-    void createIndex(std::string index_name, std::string table_name, std::string field_name);
-    void dropIndex(std::string index_name);
+    void createIndex(std::string table_name, std::string index_name, std::string field_name);
+    void dropIndex(std::string table_name, std::string index_name);
     void insertIntoTable(std::string table_name, const TableRow &row);
     void selectFromTable(std::string table_name, std::vector<std::string> field_names, std::vector<std::string> values);
     void deleteFromTable(std::string table_name, std::vector<std::string> field_names, std::vector<std::string> values);

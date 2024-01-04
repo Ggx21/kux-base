@@ -494,14 +494,75 @@ void DatabaseSystem::showIndexes()
     DbError().throw_unimplemented("show indexes");
 }
 
-void DatabaseSystem::createIndex(std::string index_name, std::string table_name, std::string field_name)
+void DatabaseSystem::createIndex(std::string table_name, std::string index_name, std::string field_name)
 {
-    DbError().throw_unimplemented("create index");
+    // Load existing table metadata from file
+    auto metadata = loadTableMetadataFromFile(base_dir + "/" + current_db + "/" + table_name + ".meta");
+
+    // Check if the index already exists
+    for (auto &index : metadata.indexes)
+    {
+        if (index.indexName == index_name)
+        {
+            DbError().throw_error(ErrorTypeEnum::SemanticError, "Index already exists: " + index_name);
+            return;
+        }
+    }
+
+    // Check if the field exists and is valid for indexing
+    bool fieldExists = false;
+    for (auto &field : metadata.fields)
+    {
+        if (field.name == field_name)
+        {
+            fieldExists = true;
+            break;
+        }
+    }
+    if (!fieldExists)
+    {
+        DbError().throw_error(ErrorTypeEnum::SemanticError, "Field does not exist: " + field_name);
+        return;
+    }
+
+    // Add the new index to metadata
+    TableIndex newIndex(index_name, {field_name}); // Assuming a single column index for simplicity
+    metadata.indexes.push_back(newIndex);
+
+    // Save the modified metadata back to file
+    saveTableMetadataToFile(metadata, base_dir + "/" + current_db + "/" + table_name + ".meta");
+    DbError().throw_info("Index created: " + index_name + " on table: " + table_name);
 }
 
-void DatabaseSystem::dropIndex(std::string index_name)
+void DatabaseSystem::dropIndex(std::string table_name, std::string index_name)
 {
-    DbError().throw_unimplemented("drop index");
+    // Load existing table metadata from file
+    auto metadata = loadTableMetadataFromFile(base_dir + "/" + current_db + "/" + table_name + ".meta");
+
+    // Iterate through indexes to find and remove the specified index
+    bool foundIndex = false;
+    for (auto it = metadata.indexes.begin(); it != metadata.indexes.end();)
+    {
+        if (it->indexName == index_name)
+        {
+            // Remove index and mark found
+            it = metadata.indexes.erase(it);
+            foundIndex = true;
+            // Save the modified metadata back to file
+            saveTableMetadataToFile(metadata, base_dir + "/" + current_db + "/" + table_name + ".meta");
+            DbError().throw_info("Index dropped: " + index_name + " from table: " + table_name);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    // If the index was not found in the table, throw an error
+    if (!foundIndex)
+    {
+        DbError().throw_error(ErrorTypeEnum::SemanticError, "Index does not exist: " + index_name);
+    }
 }
 
 void DatabaseSystem::insertIntoTable(std::string table_name, const TableRow &row)

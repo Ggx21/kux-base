@@ -62,7 +62,7 @@ namespace parser
         antlrcpp::Any visitShow_indexes(SQLParser::Show_indexesContext *ctx) override
         {
             DbError().throw_info("show indexes");
-            // DatabaseSystem::getInstance().showIndexes();
+            DatabaseSystem::getInstance().showIndexes();
             return visitChildren(ctx);
         }
 
